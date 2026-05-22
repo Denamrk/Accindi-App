@@ -8,7 +8,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.accindi.accindi22
+        bundle_identifier: com.accindi.accindi2
       flutter: stable
       xcode: latest
     scripts:
