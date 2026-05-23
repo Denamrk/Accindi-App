@@ -27,7 +27,6 @@ class _WalletScreenState extends State<WalletScreen> {
   String _query = '';
   String _filter = 'all'; // all | received | sent
   SortMode _sort = SortMode.newest;
-  bool _sortMenuOpen = false;
 
   final _sortLabels = {
     SortMode.newest: 'Newest',

@@ -17,6 +17,9 @@ workflows:
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+      - name: Flutter analyze
+        script: |
+          flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Set up provisioning profiles
         script: |
           echo $CERTIFICATE_PRIVATE_KEY_BASE64 | base64 --decode > /tmp/cert_key.pem

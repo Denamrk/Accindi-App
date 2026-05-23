@@ -16,96 +16,122 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 8),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Scale hero height to available space — 380 on tall screens,
+            // shrinks proportionally on shorter ones (min 240).
+            final heroHeight =
+                (constraints.maxHeight * 0.45).clamp(240.0, 380.0);
 
-            // Hero illustration area
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                height: 380,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(
-                    begin: Alignment(-0.6, -0.8),
-                    end: Alignment(0.8, 0.8),
-                    colors: [
-                      Color(0xFFFEEECC),
-                      Color(0xFFF0E7CE),
-                      Color(0xFFD9F0EF),
-                    ],
-                    stops: [0.0, 0.35, 1.0],
+            return Column(
+              children: [
+                // Scrollable content area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 8),
+
+                        // Hero illustration area
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            height: heroHeight,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: const LinearGradient(
+                                begin: Alignment(-0.6, -0.8),
+                                end: Alignment(0.8, 0.8),
+                                colors: [
+                                  Color(0xFFFEEECC),
+                                  Color(0xFFF0E7CE),
+                                  Color(0xFFD9F0EF),
+                                ],
+                                stops: [0.0, 0.35, 1.0],
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Stack(
+                                children: [
+                                  // Dot texture
+                                  Positioned.fill(
+                                    child: CustomPaint(
+                                      painter: _DotPatternPainter(),
+                                    ),
+                                  ),
+                                  // Placeholder illustration
+                                  Center(
+                                    child: _WelcomeIllustration(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Heading
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(28, 32, 28, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'One app.\nYour identity.\nYour rewards.',
+                                style: AppTypography.h2.copyWith(
+                                  fontSize: 32,
+                                  color: AppColors.navy,
+                                  letterSpacing: -0.7,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'The companion app for Accindi research participants. Manage your ID and earnings in one place.',
+                                style: AppTypography.mReg
+                                    .copyWith(color: AppColors.ink2),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+                      ],
+                    ),
                   ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(
+
+                // Action buttons — always visible, pinned at bottom
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Dot texture
-                      CustomPaint(
-                        size: const Size(double.infinity, 380),
-                        painter: _DotPatternPainter(),
+                      PrimaryButton(
+                          label: 'Log In', onPressed: onLogin),
+                      const SizedBox(height: 12),
+                      OutlineButton(
+                          label: 'Create Account',
+                          onPressed: onRegister),
+                      const SizedBox(height: 18),
+                      GestureDetector(
+                        onTap: () {},
+                        child: Text(
+                          'Learn more about Accindi',
+                          style: AppTypography.sBold.copyWith(
+                            color: AppColors.navy,
+                          ),
+                        ),
                       ),
-                      // Placeholder illustration
-                      Center(
-                        child: _WelcomeIllustration(),
-                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
-              ),
-            ),
-
-            // Heading
-            Padding(
-              padding: const EdgeInsets.fromLTRB(28, 32, 28, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'One app.\nYour identity.\nYour rewards.',
-                    style: AppTypography.h2.copyWith(
-                      fontSize: 32,
-                      color: AppColors.navy,
-                      letterSpacing: -0.7,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'The companion app for Accindi research participants. Manage your ID and earnings in one place.',
-                    style: AppTypography.mReg.copyWith(color: AppColors.ink2),
-                  ),
-                ],
-              ),
-            ),
-
-            const Spacer(),
-
-            // Action buttons
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-              child: Column(
-                children: [
-                  PrimaryButton(label: 'Log In', onPressed: onLogin),
-                  const SizedBox(height: 12),
-                  OutlineButton(label: 'Create Account', onPressed: onRegister),
-                  const SizedBox(height: 18),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'Learn more about Accindi',
-                      style: AppTypography.sBold.copyWith(
-                        color: AppColors.navy,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                ],
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
