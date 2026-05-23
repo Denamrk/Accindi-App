@@ -8,6 +8,8 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
+      groups:
+        - signing
     scripts:
       - name: Set up code signing
         script: |
