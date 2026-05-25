@@ -10,7 +10,15 @@ class LoginScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
   final VoidCallback? onForgot;
 
-  const LoginScreen({super.key, this.onSuccess, this.onForgot});
+  /// If true, skip email entry and go straight to PIN (returning user).
+  final bool pinOnly;
+
+  const LoginScreen({
+    super.key,
+    this.onSuccess,
+    this.onForgot,
+    this.pinOnly = false,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -32,6 +40,12 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 320),
       vsync: this,
     );
+
+    // Returning user: skip email step, go straight to PIN
+    if (widget.pinOnly && Session().email != null) {
+      _email = Session().email!;
+      _emailConfirmed = true;
+    }
   }
 
   @override
@@ -175,24 +189,25 @@ class _LoginScreenState extends State<LoginScreen>
       children: [
         const SizedBox(height: 16),
 
-        // Back to email
-        Align(
-          alignment: Alignment.centerLeft,
-          child: GestureDetector(
-            onTap: () => setState(() {
-              _emailConfirmed = false;
-              _pin = '';
-            }),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                child: const Icon(
-                  Icons.chevron_left,
-                  color: AppColors.navy,
-                  size: 28,
+        // Back to email (hidden in pinOnly mode)
+        if (!widget.pinOnly)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _emailConfirmed = false;
+                _pin = '';
+              }),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.chevron_left,
+                    color: AppColors.navy,
+                    size: 28,
                 ),
               ),
             ),

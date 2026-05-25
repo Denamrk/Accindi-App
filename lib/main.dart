@@ -27,6 +27,7 @@ class AccindiApp extends StatelessWidget {
         '/welcome': (_) => const _WelcomeWrapper(),
         '/register': (_) => const _RegisterWrapper(),
         '/login': (_) => const _LoginWrapper(),
+        '/pin': (_) => const _PinWrapper(),
         '/home': (_) => const HomeShell(),
       },
     );
@@ -41,7 +42,8 @@ class _SplashWrapper extends StatelessWidget {
     return SplashScreen(
       onDone: () {
         if (Session().isLoggedIn) {
-          Navigator.of(context).pushReplacementNamed('/home');
+          // Returning user — require PIN before entering app
+          Navigator.of(context).pushReplacementNamed('/pin');
         } else {
           Navigator.of(context).pushReplacementNamed('/welcome');
         }
@@ -71,6 +73,23 @@ class _RegisterWrapper extends StatelessWidget {
       onBack: () => Navigator.of(context).pop(),
       onLogin: () {
         Navigator.of(context).pushReplacementNamed('/login');
+      },
+    );
+  }
+}
+
+class _PinWrapper extends StatelessWidget {
+  const _PinWrapper();
+
+  @override
+  Widget build(BuildContext context) {
+    return LoginScreen(
+      pinOnly: true,
+      onSuccess: () {
+        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+      },
+      onForgot: () {
+        // TODO: forgot PIN flow
       },
     );
   }
