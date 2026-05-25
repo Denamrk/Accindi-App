@@ -114,7 +114,7 @@ class BixApi {
   }) async {
     final hashedPin = hashPin(pin);
 
-    final uri = Uri.parse('$_baseUrl/loginUser').replace(
+    final uri = Uri.parse('$_baseUrl/login').replace(
       queryParameters: {
         'senderName': '-',
         'senderEmail': email,
