@@ -6,6 +6,8 @@ import '../widgets/tx_row.dart';
 
 class DashboardScreen extends StatelessWidget {
   final String userName;
+  final String balance;
+  final List<Transaction> transactions;
   final VoidCallback? onNotifications;
   final VoidCallback? onWallet;
   final VoidCallback? onScan;
@@ -15,6 +17,8 @@ class DashboardScreen extends StatelessWidget {
   const DashboardScreen({
     super.key,
     this.userName = 'Erik',
+    this.balance = '0',
+    this.transactions = const [],
     this.onNotifications,
     this.onWallet,
     this.onScan,
@@ -152,12 +156,12 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '1,430 pts',
+                    '$balance pts',
                     style: AppTypography.h3.copyWith(color: Colors.white),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '≈ 1,430 SEK',
+                    '≈ $balance SEK',
                     style: AppTypography.sReg.copyWith(
                       color: Colors.white.withValues(alpha: 0.75),
                     ),
@@ -187,7 +191,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildRecentActivity() {
-    final recent = demoTransactions.take(3).toList();
+    final recent = transactions.take(3).toList();
 
     return Column(
       children: [
@@ -208,17 +212,26 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 4),
-        ...List.generate(recent.length, (i) {
-          final tx = recent[i];
-          return TxRow(
-            desc: tx.desc,
-            date: tx.date,
-            amount: tx.amount,
-            incoming: tx.incoming,
-            onTap: () => onTxClick?.call(tx),
-            last: i == recent.length - 1,
-          );
-        }),
+        if (recent.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'No transactions yet',
+              style: AppTypography.sReg.copyWith(color: AppColors.ink3),
+            ),
+          )
+        else
+          ...List.generate(recent.length, (i) {
+            final tx = recent[i];
+            return TxRow(
+              desc: tx.desc,
+              date: tx.date,
+              amount: tx.amount,
+              incoming: tx.incoming,
+              onTap: () => onTxClick?.call(tx),
+              last: i == recent.length - 1,
+            );
+          }),
       ],
     );
   }

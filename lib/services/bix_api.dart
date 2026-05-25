@@ -128,6 +128,25 @@ class BixApi {
     return _postRequest(uri);
   }
 
+  /// Fetch the user's BIX coin transactions and balance.
+  ///
+  /// Response data[0] = balance (e.g. "4998.00").
+  /// When transactions exist, additional data entries contain transaction info.
+  static Future<BixResponse> listTransactions({
+    required String authorizationKey,
+    required String email,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/bixCoinsListTransactions').replace(
+      queryParameters: {
+        'authorizationKey': authorizationKey,
+        'senderEmail': email,
+        'sender': 'browser',
+      },
+    );
+
+    return _postRequest(uri);
+  }
+
   /// Logout the current session.
   static Future<BixResponse> logout({
     required String authorizationKey,

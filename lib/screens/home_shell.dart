@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
+import '../services/session.dart';
+import '../services/wallet_state.dart';
 import '../widgets/app_tab_bar.dart';
 import 'dashboard_screen.dart';
 import 'wallet_screen.dart';
@@ -17,6 +19,23 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   String _activeTab = 'home';
+  final _wallet = WalletState();
+
+  @override
+  void initState() {
+    super.initState();
+    _wallet.addListener(_onWalletChanged);
+  }
+
+  @override
+  void dispose() {
+    _wallet.removeListener(_onWalletChanged);
+    super.dispose();
+  }
+
+  void _onWalletChanged() {
+    if (mounted) setState(() {});
+  }
 
   void _onTabChanged(String tab) {
     setState(() => _activeTab = tab);
@@ -66,7 +85,12 @@ class _HomeShellState extends State<HomeShell> {
   Widget _buildBody() {
     switch (_activeTab) {
       case 'home':
+        // Extract first name from session for greeting
+        final userName = Session().email?.split('@').first ?? 'there';
         return DashboardScreen(
+          userName: userName,
+          balance: _wallet.balanceDisplay,
+          transactions: _wallet.transactions,
           onWallet: () => _onTabChanged('wallet'),
           onViewAll: () => _onTabChanged('wallet'),
           onTxClick: _openTxDetail,
@@ -79,6 +103,8 @@ class _HomeShellState extends State<HomeShell> {
         );
       case 'wallet':
         return WalletScreen(
+          balance: _wallet.balanceDisplay,
+          transactions: _wallet.transactions,
           onSend: _openSend,
           onRequest: _openRequest,
           onTxClick: _openTxDetail,

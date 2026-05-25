@@ -5,6 +5,7 @@ import '../widgets/floating_label_field.dart';
 import '../widgets/primary_button.dart';
 import '../services/bix_api.dart';
 import '../services/session.dart';
+import '../services/wallet_state.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -94,6 +95,11 @@ class _LoginScreenState extends State<LoginScreen>
       // Save session data locally
       await Session().setFromLoginData(response.data);
       Session().email = _email;
+
+      // Fetch wallet balance & transactions before navigating
+      await WalletState().fetch();
+
+      if (!mounted) return;
       widget.onSuccess?.call();
     } else {
       // Shake the dots and show error

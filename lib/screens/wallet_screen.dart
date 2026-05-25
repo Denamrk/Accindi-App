@@ -8,12 +8,16 @@ import '../widgets/top_bar.dart';
 enum SortMode { newest, oldest, high, low }
 
 class WalletScreen extends StatefulWidget {
+  final String balance;
+  final List<Transaction> transactions;
   final VoidCallback? onSend;
   final VoidCallback? onRequest;
   final ValueChanged<Transaction>? onTxClick;
 
   const WalletScreen({
     super.key,
+    this.balance = '0',
+    this.transactions = const [],
     this.onSend,
     this.onRequest,
     this.onTxClick,
@@ -36,7 +40,7 @@ class _WalletScreenState extends State<WalletScreen> {
   };
 
   List<Transaction> get _filteredList {
-    var list = demoTransactions.where((t) {
+    var list = widget.transactions.where((t) {
       if (_query.isNotEmpty &&
           !t.desc.toLowerCase().contains(_query.toLowerCase())) {
         return false;
@@ -161,7 +165,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
-                    '1,430',
+                    widget.balance,
                     style: AppTypography.h2.copyWith(
                       fontSize: 44,
                       color: Colors.white,
@@ -183,7 +187,7 @@ class _WalletScreenState extends State<WalletScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                '≈ 1,430 SEK',
+                '≈ ${widget.balance} SEK',
                 style: AppTypography.sReg.copyWith(
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
@@ -197,9 +201,9 @@ class _WalletScreenState extends State<WalletScreen> {
               // Available + Pending
               Row(
                 children: [
-                  _balanceSplit('Available', '1,330 pts', Colors.white),
+                  _balanceSplit('Available', '${widget.balance} pts', Colors.white),
                   const SizedBox(width: 24),
-                  _balanceSplit('Pending', '100 pts', AppColors.gold),
+                  _balanceSplit('Pending', '0 pts', AppColors.gold),
                 ],
               ),
             ],
@@ -357,9 +361,9 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildFilterChips() {
     final filters = [
-      ('all', 'All', demoTransactions.length),
-      ('received', 'Received', demoTransactions.where((t) => t.incoming).length),
-      ('sent', 'Sent', demoTransactions.where((t) => !t.incoming).length),
+      ('all', 'All', widget.transactions.length),
+      ('received', 'Received', widget.transactions.where((t) => t.incoming).length),
+      ('sent', 'Sent', widget.transactions.where((t) => !t.incoming).length),
     ];
 
     return SingleChildScrollView(
