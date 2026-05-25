@@ -62,10 +62,6 @@ class _RegisterWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return RegistrationScreen(
       onBack: () => Navigator.of(context).pop(),
-      onSubmit: () {
-        // After registration, go to home (replace all onboarding stack)
-        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
-      },
       onLogin: () {
         Navigator.of(context).pushReplacementNamed('/login');
       },
