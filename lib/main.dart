@@ -5,8 +5,11 @@ import 'screens/welcome_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_shell.dart';
+import 'services/session.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Session().load(); // Restore saved session from local storage
   runApp(const AccindiApp());
 }
 
@@ -37,7 +40,11 @@ class _SplashWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return SplashScreen(
       onDone: () {
-        Navigator.of(context).pushReplacementNamed('/welcome');
+        if (Session().isLoggedIn) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          Navigator.of(context).pushReplacementNamed('/welcome');
+        }
       },
     );
   }

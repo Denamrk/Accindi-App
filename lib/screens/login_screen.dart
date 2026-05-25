@@ -77,8 +77,8 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() => _loading = false);
 
     if (response.isSuccess) {
-      // Save session data
-      Session().setFromLoginData(response.data);
+      // Save session data locally
+      await Session().setFromLoginData(response.data);
       Session().email = _email;
       widget.onSuccess?.call();
     } else {
