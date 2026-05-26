@@ -65,12 +65,22 @@ class WalletState extends ChangeNotifier {
         _balance = double.tryParse(response.data[0]) ?? 0;
       }
 
-      // Parse transactions from data[3] (detailed JSON entries)
+      // Parse transactions from data[3] (detailed JSON) or data[1] (summary)
       _transactions = [];
-      if (response.data.length > 3 && response.data[3].isNotEmpty) {
+
+      // Try detailed JSON entries in data[3] first
+      if (response.data.length > 3 &&
+          response.data[3].isNotEmpty &&
+          response.data[3] != '-' &&
+          response.data[3].contains('{')) {
         _parseDetailedTransactions(response.data[3]);
-      } else if (response.data.length > 1 && response.data[1].isNotEmpty) {
-        // Fallback: parse from data[1] summary rows
+      }
+
+      // If data[3] produced nothing, fall back to data[1] summary rows
+      if (_transactions.isEmpty &&
+          response.data.length > 1 &&
+          response.data[1].isNotEmpty &&
+          response.data[1] != '-') {
         _parseSummaryTransactions(response.data[1]);
       }
 
