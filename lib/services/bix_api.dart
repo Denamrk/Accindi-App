@@ -128,6 +128,35 @@ class BixApi {
     return _postRequest(uri);
   }
 
+  /// Request a payment from another user.
+  ///
+  /// [senderEmail] = the logged-in user requesting the payment.
+  /// [receiverEmail] = the user being asked to pay.
+  /// [amount] = the transaction amount as a string (e.g. "100.00").
+  static Future<BixResponse> requestPayment({
+    required String authorizationKey,
+    required String senderEmail,
+    required String receiverEmail,
+    required String amount,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/bixCoinsRequestPayment').replace(
+      queryParameters: {
+        'authorizationKey': authorizationKey,
+        'senderEmail': senderEmail,
+        'receiverEmail': receiverEmail,
+        'invoiceRef': '',
+        'sendAmount': amount,
+        'txCost': '0.00',
+        'sAFee': '0.00',
+        'sOFee': '0.00',
+        'recAmount': amount,
+        'sender': 'browser',
+      },
+    );
+
+    return _postRequest(uri);
+  }
+
   /// Fetch the user's BIX coin transactions and balance.
   ///
   /// Response data[0] = balance (e.g. "4998.00").

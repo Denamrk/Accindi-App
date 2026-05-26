@@ -5,6 +5,9 @@ import '../theme/app_typography.dart';
 import '../widgets/top_bar.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/floating_label_field.dart';
+import '../services/bix_api.dart';
+import '../services/session.dart';
+import '../services/wallet_state.dart';
 
 class RequestPointsScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -19,9 +22,101 @@ class _RequestPointsScreenState extends State<RequestPointsScreen> {
   String _from = '';
   String _amount = '';
   String _reason = '';
+  bool _loading = false;
 
   int get _amountNum => int.tryParse(_amount) ?? 0;
-  bool get _isValid => _from.isNotEmpty && _amountNum > 0;
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+  }
+
+  bool get _isValid => _isValidEmail(_from) && _amountNum > 0;
+
+  Future<void> _handleSubmit() async {
+    if (!_isValid || _loading) return;
+
+    setState(() => _loading = true);
+
+    final session = Session();
+    final response = await BixApi.requestPayment(
+      authorizationKey: session.authorizationKey!,
+      senderEmail: session.email!,
+      receiverEmail: _from,
+      amount: '$_amountNum.00',
+    );
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (response.isSuccess) {
+      // Refresh wallet data
+      WalletState().fetch();
+
+      _showResultDialog(
+        title: 'Request Sent',
+        message: response.displayMessage.isNotEmpty
+            ? response.displayMessage
+            : 'Payment request for $_amountNum pts sent to $_from.',
+        isSuccess: true,
+      );
+    } else {
+      _showResultDialog(
+        title: response.isInfo ? 'Notice' : 'Error',
+        message: response.displayMessage.isNotEmpty
+            ? response.displayMessage
+            : 'Failed to send request. Please try again.',
+        isSuccess: false,
+      );
+    }
+  }
+
+  void _showResultDialog({
+    required String title,
+    required String message,
+    required bool isSuccess,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: !isSuccess,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(
+              isSuccess ? Icons.check_circle : Icons.info_outline,
+              color: isSuccess ? AppColors.teal : AppColors.navy,
+              size: 24,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: AppTypography.mBold.copyWith(color: AppColors.ink),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: AppTypography.sReg.copyWith(color: AppColors.ink2),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (isSuccess) {
+                widget.onBack?.call(); // Go back to wallet
+              }
+            },
+            child: Text(
+              isSuccess ? 'Done' : 'OK',
+              style: AppTypography.sBold.copyWith(color: AppColors.navy),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +130,11 @@ class _RequestPointsScreenState extends State<RequestPointsScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
               children: [
                 FloatingLabelField(
-                  label: 'From',
-                  placeholder: 'Name, email, or Wallet ID',
+                  label: 'From (email)',
+                  placeholder: 'user@example.com',
                   value: _from,
                   onChanged: (v) => setState(() => _from = v),
+                  keyboardType: TextInputType.emailAddress,
                 ),
 
                 // Big amount field
@@ -74,7 +170,9 @@ class _RequestPointsScreenState extends State<RequestPointsScreen> {
                         textAlign: TextAlign.center,
                         style: AppTypography.h2.copyWith(
                           fontSize: 48,
-                          color: _amount.isNotEmpty ? AppColors.navy : AppColors.ink3,
+                          color: _amount.isNotEmpty
+                              ? AppColors.navy
+                              : AppColors.ink3,
                           letterSpacing: -1,
                         ),
                         decoration: InputDecoration(
@@ -119,11 +217,21 @@ class _RequestPointsScreenState extends State<RequestPointsScreen> {
 
                 const SizedBox(height: 40),
 
-                PrimaryButton(
-                  label: 'Send Request',
-                  onPressed: _isValid ? () {} : null,
-                  disabled: !_isValid,
-                ),
+                _loading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: CircularProgressIndicator(
+                            color: AppColors.navy,
+                            strokeWidth: 2.5,
+                          ),
+                        ),
+                      )
+                    : PrimaryButton(
+                        label: 'Send Request',
+                        onPressed: _isValid ? _handleSubmit : null,
+                        disabled: !_isValid,
+                      ),
               ],
             ),
           ),

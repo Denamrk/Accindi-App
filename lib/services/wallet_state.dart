@@ -123,9 +123,7 @@ class WalletState extends ChangeNotifier {
         final txType = payload['txType']?.toString() ?? '';
         final txId = payload['txID']?.toString() ?? '';
         final sendAmount = double.tryParse(payload['sendAmount']?.toString() ?? '') ?? 0;
-        final txCost = double.tryParse(payload['txCost']?.toString() ?? '') ?? 0;
         final recAmount = double.tryParse(payload['recAmount']?.toString() ?? '') ?? 0;
-        final balanceAfter = payload['bixCoinsTokensBalance']?.toString() ?? '';
 
         // Determine if incoming (received) or outgoing (sent)
         final isIncoming = recAmount > 0;

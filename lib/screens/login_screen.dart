@@ -195,25 +195,25 @@ class _LoginScreenState extends State<LoginScreen>
       children: [
         const SizedBox(height: 16),
 
-        // Back to email (hidden in pinOnly mode)
-        if (!widget.pinOnly)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _emailConfirmed = false;
-                _pin = '';
-              }),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.chevron_left,
-                    color: AppColors.navy,
-                    size: 28,
+        // Back to email entry
+        Align(
+          alignment: Alignment.centerLeft,
+          child: GestureDetector(
+            onTap: () => setState(() {
+              _emailConfirmed = false;
+              _pin = '';
+              _email = '';
+            }),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.chevron_left,
+                  color: AppColors.navy,
+                  size: 28,
                 ),
               ),
             ),
